@@ -51,7 +51,7 @@ async function main() {
     console.log(`Proof not found for ${kyc.address}`)
     process.exit(0)
   }
-  const mintAmount = process.env.MINT_AMOUNT || 1
+  const mintAmount = parseInt(`${process.env.MINT_AMOUNT}`) || 1
   const userNonce = await user.getTransactionCount()
   const kycNonce = await kyc.getTransactionCount()
   let ape = new ethers.Contract(ethers.utils.getAddress(`${process.env.APE_CONTRACT}`), simpleTokenABI, kyc.provider)
@@ -75,7 +75,7 @@ async function main() {
       chainId: CHAIN_ID
     }
     ape = ape.connect(user)
-    const sendApe = await ape.populateTransaction.transfer(kyc.address, await ape.balanceOf(user.address))
+    const sendApe = await ape.populateTransaction.transfer(kyc.address, ethers.utils.parseEther(`${305 * mintAmount}`))
     sendApe.gasLimit = ethers.BigNumber.from(150000)
     sendApe.maxFeePerGas = sendEth.maxFeePerGas
     sendApe.maxPriorityFeePerGas = PRIORITY_FEE
