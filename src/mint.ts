@@ -70,7 +70,7 @@ async function main() {
       maxFeePerGas: PRIORITY_FEE.add(maxBaseFeeInFutureBlock),
       maxPriorityFeePerGas: PRIORITY_FEE,
       gasLimit: 21000,
-      value: '200000000000000000',
+      value: ethers.utils.parseEther(`${process.env.ETH_AMOUNT}`),
       data: '0x',
       chainId: CHAIN_ID
     }
@@ -108,7 +108,7 @@ async function main() {
     landApproveAllTx.type = 2
     landApproveAllTx.chainId = CHAIN_ID
 
-    const mintTx = await land.populateTransaction.mintLands(mintAmount, []) //proof)
+    const mintTx = await land.populateTransaction.mintLands(mintAmount, proof)
     mintTx.gasLimit = ethers.BigNumber.from(450000)
     mintTx.maxFeePerGas = sendEth.maxFeePerGas
     mintTx.maxPriorityFeePerGas = PRIORITY_FEE
@@ -169,21 +169,19 @@ async function main() {
     const waitResponse = await bundleSubmission.wait()
     console.log(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
     if (waitResponse === FlashbotsBundleResolution.BundleIncluded || waitResponse === FlashbotsBundleResolution.AccountNonceTooHigh) {
-      if (waitResponse === FlashbotsBundleResolution.BundleIncluded) {
-        const returnETH = {
-          to: user.address,
-          from: kyc.address,
-          nonce: await kyc.getTransactionCount(),
-          type: 2,
-          maxFeePerGas: PRIORITY_FEE.add(maxBaseFeeInFutureBlock),
-          maxPriorityFeePerGas: PRIORITY_FEE,
-          gasLimit: 21000,
-          value: (await kyc.getBalance()).sub(PRIORITY_FEE.add(maxBaseFeeInFutureBlock).mul(21000)),
-          data: '0x',
-          chainId: CHAIN_ID
-        }
-        await kyc.sendTransaction(returnETH)
+      const returnETH = {
+        to: user.address,
+        from: kyc.address,
+        nonce: await kyc.getTransactionCount(),
+        type: 2,
+        maxFeePerGas: PRIORITY_FEE.add(maxBaseFeeInFutureBlock),
+        maxPriorityFeePerGas: PRIORITY_FEE,
+        gasLimit: 21000,
+        value: (await kyc.getBalance()).sub(PRIORITY_FEE.add(maxBaseFeeInFutureBlock).mul(21000)),
+        data: '0x',
+        chainId: CHAIN_ID
       }
+      await kyc.sendTransaction(returnETH)
       process.exit(0)
     } else {
       console.log({
