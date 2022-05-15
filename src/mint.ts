@@ -20,7 +20,6 @@ const FLASHBOTS_EP = 'https://relay.flashbots.net/'
 // ===== Uncomment this for Goerli =======
 // const CHAIN_ID = 5
 // const FLASHBOTS_EP = 'https://relay-goerli.flashbots.net/'
-
 // ===== Uncomment this for Goerli =======
 let provider: BaseProvider
 if (process.env.ALCHEMY_API_KEY !== undefined) {
